@@ -229,8 +229,6 @@ variable "tags" {
 
 variable "name_prefix" {
   type = list(object({
-  description = "Prefix to use in resource names"
-  type        = string
   name        = string
   }))
   default     = [{
