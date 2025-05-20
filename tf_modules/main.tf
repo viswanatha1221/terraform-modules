@@ -18,5 +18,5 @@ module "ec2" {
 
 module "s3" {
   source      = "./s3"
-  bucket_name = "edms-dev"
+  bucket_name = "edms-dev-2025"
 }
