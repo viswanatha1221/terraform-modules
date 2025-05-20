@@ -2,7 +2,7 @@ locals {
   create_instance_profile = var.enabled && try(length(var.instance_profile), 0) == 0
   instance_profile        = local.create_instance_profile ? join("", aws_iam_instance_profile.default[*].name) : var.instance_profile
   eip_enabled             = var.associate_public_ip_address && var.assign_eip_address && var.enabled
-  security_group_enabled  = var.enabled && var.sg_id
+  security_group_enabled  = var.enabled && var.sg_id != ""
   public_dns              = local.eip_enabled ? local.public_dns_rendered : join("", aws_instance.db-instance[*].public_dns)
   public_dns_rendered = local.eip_enabled ? format("ec2-%s.%s.amazonaws.com",
     replace(join("", aws_eip.default[*].public_ip), ".", "-"),
