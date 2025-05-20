@@ -5,16 +5,6 @@ on:
     
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Target Environment'
-        required: true
-        default: ''
-        type: choice
-        options:
-           - ''
-           - dev
-           - stage
-           - prod
       terraform_action:
         description: 'Terraform_Action'
         default: ''
