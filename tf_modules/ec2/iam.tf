@@ -1,19 +1,19 @@
 locals {
-  instance_profile_name = "${var.name_prefix}-instance-profile"
-  iam_role_name         = "${var.name_prefix}-role"
-  iam_policy_name       = "${var.name_prefix}-policy"
+  instance_profile_names = [for prefix in var.name_prefix : "${prefix}-instance-profile"]
+  iam_role_names         = [for prefix in var.name_prefix : "${prefix}-role"]
+  iam_policy_names       = [for prefix in var.name_prefix : "${prefix}-policy"]
 }
 
 resource "aws_iam_instance_profile" "default" {
-  count = var.enabled && local.create_instance_profile ? 1 : 0
-  name  = local.instance_profile_name
+  count = length(var.name_prefix)
+  name  = local.instance_profile_names[count.index]
   role  = aws_iam_role.default[0].name
   tags  = var.tags
 }
 
 resource "aws_iam_role" "default" {
-  count = var.enabled && local.create_instance_profile ? 1 : 0
-  name  = local.iam_role_name
+  count = length(var.name_prefix)
+  name  = local.iam_role_names[count.index]
   path  = "/"
   tags  = var.tags
 
@@ -21,8 +21,8 @@ resource "aws_iam_role" "default" {
 }
 
 resource "aws_iam_role_policy" "main" {
-  count  = var.enabled && local.create_instance_profile ? 1 : 0
-  name   = local.iam_policy_name
+  count = length(var.name_prefix)
+  name   = local.iam_policy_names[count.index]
   role   = aws_iam_role.default[0].id
   policy = data.aws_iam_policy_document.main.json
 }
