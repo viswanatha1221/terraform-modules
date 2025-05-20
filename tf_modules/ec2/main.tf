@@ -21,7 +21,7 @@ resource "aws_instance" "db-instance" {
   instance_type               = var.instance_type
   user_data                   = var.instances[count.index].user_data
   vpc_security_group_ids      = [var.sg_id]
-  iam_instance_profile        = local.instance_profile
+  iam_instance_profile        = local.instance_profile_names[count.index]
   associate_public_ip_address = var.associate_public_ip_address
   subnet_id                   = var.subnets[count.index]
 
