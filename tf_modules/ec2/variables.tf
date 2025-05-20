@@ -228,19 +228,7 @@ variable "tags" {
 }
 
 variable "name_prefix" {
-  type = list(object({
-  name        = string
-  }))
-  default     = [{
-      name    = "postgres"
-  },
-  {
-      name    = "redis"
-  }]
+  type        = list(string)
+  default     = ["postgres", "redis"]
+  description = "List of name prefixes for resources"
 }
-
-variable "environment" {
-  description = "Environment name"
-  type        = string
-}
-

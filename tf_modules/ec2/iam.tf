@@ -1,7 +1,7 @@
 locals {
-  instance_profile_name = "${var.name_prefix}-${var.environment}-instance-profile"
-  iam_role_name         = "${var.name_prefix}-${var.environment}-role"
-  iam_policy_name       = "${var.name_prefix}-${var.environment}-policy"
+  instance_profile_name = "${var.name_prefix}-instance-profile"
+  iam_role_name         = "${var.name_prefix}-role"
+  iam_policy_name       = "${var.name_prefix}-policy"
 }
 
 resource "aws_iam_instance_profile" "default" {
