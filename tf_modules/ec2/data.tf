@@ -1,7 +1,7 @@
 data "aws_region" "default" {}
 
 data "aws_ami" "default" {
-  count = module.this.enabled && var.ami == null ? 1 : 0
+  count = var.enabled && var.ami == null ? 1 : 0
 
   most_recent = "true"
 

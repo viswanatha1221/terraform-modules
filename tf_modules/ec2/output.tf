@@ -1,8 +1,8 @@
 output "postgresql_instance_ids" {
-  value = aws_instance.ec2_postgresql[*].id
+  value = aws_instance.db-instance[*].id
 }
 
 output "redis_instance_ids" {
-  value = aws_instance.ec2_redis[*].id
+  value = aws_instance.db-instance[*].id
 }
 
