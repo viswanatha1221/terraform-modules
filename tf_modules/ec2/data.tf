@@ -1,19 +1,17 @@
-data "aws_ami" "amazon-2" {
-  most_recent = true
+data "aws_region" "default" {}
 
-  filter {
-    name = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-ebs"]
+data "aws_ami" "default" {
+  count = var.enabled && var.ami == null ? 1 : 0
+
+  most_recent = "true"
+
+  dynamic "filter" {
+    for_each = var.ami_filter
+    content {
+      name   = filter.key
+      values = filter.value
+    }
   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["amazon"]
-}
-
-data "aws_availability_zones" "available" {
-  state = "available"
+  owners = var.ami_owners
 }
