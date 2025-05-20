@@ -14,3 +14,8 @@ module "ec2" {
   sg_id   = module.sg.sg_id
   subnets = module.vpc.subnet_ids
 }
+
+module "my_bucket" {
+  source      = ".s3"
+  bucket_name = "edms-dev"
+}
