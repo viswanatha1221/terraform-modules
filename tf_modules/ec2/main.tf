@@ -115,8 +115,8 @@ resource "aws_iam_policy" "s3_access_policy" {
         "s3:ListBucket"
       ]
       Resource = [
-        module.s3.bucket_arn,
-        "${module.s3.bucket_arn}/*"
+        var.s3_bucket_arn,
+        "${var.s3_bucket_arn}/*"
       ]
     }]
   })
