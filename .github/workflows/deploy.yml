@@ -2,6 +2,11 @@ name: Terraform CI CD Pipeline for Deploying AWS Resources
 run-name: ${{ github.actor }} has triggered the pipeline
 
 on: 
+  push:
+    branches:
+      - 'main'
+      - 'feature/*'
+      
   workflow_dispatch:
     inputs:
       environment:
@@ -44,17 +49,6 @@ jobs:
     name: terraform-ci-cd
     runs-on: ubuntu-latest
     steps:
-    - name: Pre Build Checks
-      run: |
-        if [[ ${{ github.event.inputs.terraform_action }} == "plan" ]] && [[ $${{ github.event.inputs.terraform_folder }} == "prod" ]]; then
-            echo "::error ::Pre Build Checks Failed: Terraform Plan cant be run on Prod"
-            exit 1
-        elif [[  ${{ github.event.inputs.terraform_action }} == "apply" ]] && [[ ${{ github.ref }} != "refs/heads/main" ]]; then
-            echo "::error ::Pre Build Checks Failed: Terraform Apply can only be run on main branch"
-            exit 1
-        else
-            echo "::notice ::Pre Build Checks Passed"
-        fi
     - name: Checkout
       uses: actions/checkout@v2
     - name: Set up Terraform
@@ -81,7 +75,7 @@ jobs:
       if: github.event_name == 'pull_request'
       env:
         PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-        with:
+      with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
