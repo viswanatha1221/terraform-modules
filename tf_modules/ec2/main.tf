@@ -124,6 +124,11 @@ resource "aws_iam_policy" "s3_access_policy" {
 
 # Attach policy to role
 resource "aws_iam_role_policy_attachment" "ec2_attach_policy" {
-  role       = aws_iam_role.ec2_role.name
+  role       = aws_iam_role.postgresql_role.name
+  policy_arn = aws_iam_policy.s3_access_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_attach_policy_redis" {
+  role       = aws_iam_role.redis_role.name
   policy_arn = aws_iam_policy.s3_access_policy.arn
 }
