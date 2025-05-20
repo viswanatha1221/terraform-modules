@@ -13,11 +13,13 @@ variable "instances" {
     name          = string
     instance_type = string
     user_data     = string
+    tags          = map(string)
   }))
   default = [
     {
       name          = "postgres"
       instance_type = "t2.micro"
+      tags          = "postgres" 
       user_data     = <<-EOF
         #!/bin/bash
         yum update -y
@@ -31,6 +33,7 @@ variable "instances" {
     {
       name          = "redis"
       instance_type = "t2.micro"
+      tags          = "redis"
       user_data     = <<-EOF
         #!/bin/bash
         yum update -y

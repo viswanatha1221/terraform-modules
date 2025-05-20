@@ -42,7 +42,7 @@ resource "aws_instance" "db-instance" {
     }
   }
 
-  tags = var.tags
+  tags = var.instances[count.index].tags
 }
 
 resource "aws_eip" "default" {
