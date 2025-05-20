@@ -13,4 +13,10 @@ module "ec2" {
   source  = "./ec2"
   sg_id   = module.sg.sg_id
   subnets = module.vpc.subnet_ids
+  s3_bucket_arn = module.s3.bucket_arn
+}
+
+module "s3" {
+  source      = "./s3"
+  bucket_name = "edms-dev"
 }

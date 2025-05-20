@@ -13,3 +13,8 @@ variable "ec2_names" {
     type = list(string)
     default = ["postgresql-node", "redis-node"]
 }
+
+variable "s3_bucket_arn" {
+  type        = string
+  description = "ARN of the S3 bucket"
+}
