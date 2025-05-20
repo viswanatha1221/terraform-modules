@@ -40,3 +40,4 @@ Step 5: Connect Remotely (e.g., with psql CLI or DBeaver)
 
 psql -h 54.210.123.45 -U myuser -d mydb -W
 
+let see
