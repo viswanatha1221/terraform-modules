@@ -11,7 +11,6 @@ variable "subnets" {
 variable "instances" {
   type = list(object({
     name          = string
-    ami           = string
     instance_type = string
     user_data     = string
   }))
@@ -20,29 +19,29 @@ variable "instances" {
       name          = "postgres"
       instance_type = "t2.micro"
       user_data     = <<-EOF
-              #!/bin/bash
-              yum update -y
-              amazon-linux-extras enable postgresql14
-              yum install -y postgresql-server
-              postgresql-setup initdb
-              systemctl enable postgresql
-              systemctl start postgresql
-              EOF
+        #!/bin/bash
+        yum update -y
+        amazon-linux-extras enable postgresql14
+        yum install -y postgresql-server
+        postgresql-setup initdb
+        systemctl enable postgresql
+        systemctl start postgresql
+      EOF
     },
     {
       name          = "redis"
       instance_type = "t2.micro"
       user_data     = <<-EOF
-              #!/bin/bash
-              yum update -y
-              amazon-linux-extras install epel -y
-              yum install -y redis
-              systemctl enable redis
-              systemctl start redis
-              sed -i 's/^bind 127.0.0.1 -::1/#bind 127.0.0.1 -::1/' /etc/redis/redis.conf
-              sed -i 's/protected-mode yes/protected-mode no/' /etc/redis/redis.conf
-              systemctl restart redis
-              EOF
+        #!/bin/bash
+        yum update -y
+        amazon-linux-extras install epel -y
+        yum install -y redis
+        systemctl enable redis
+        systemctl start redis
+        sed -i 's/^bind 127.0.0.1 -::1/#bind 127.0.0.1 -::1/' /etc/redis/redis.conf
+        sed -i 's/protected-mode yes/protected-mode no/' /etc/redis/redis.conf
+        systemctl restart redis
+      EOF
     }
   ]
 }
@@ -62,11 +61,6 @@ variable "instance_type" {
 variable "vpc_id" {
   type        = string
   description = "VPC ID"
-}
-
-variable "subnets" {
-  type        = list(string)
-  description = "AWS subnet IDs"
 }
 
 variable "user_data" {
