@@ -5,6 +5,7 @@ resource "aws_instance" "ec2_postgresql" {
   vpc_security_group_ids      = [var.sg_id]
   subnet_id                   = var.subnets[0]
   availability_zone           = data.aws_availability_zones.available.names[0]
+  iam_instance_profile        = aws_iam_instance_profile.postgresql_profile.name
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
@@ -38,6 +39,7 @@ resource "aws_instance" "ec2_redis" {
   vpc_security_group_ids      = [var.sg_id]
   subnet_id                   = var.subnets[1]
   availability_zone           = data.aws_availability_zones.available.names[1]
+  iam_instance_profile        = aws_iam_instance_profile.redis_profile.name
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
