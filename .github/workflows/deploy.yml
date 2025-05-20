@@ -26,12 +26,12 @@ jobs:
       - name: Terraform Validate
         id: validate
         run: terraform validate
-        working-directory: ./modules
+        working-directory: ./tf_modules
       - name: Terraform Plan
         id: plan
         run: terraform plan
-        working-directory: ./modules
+        working-directory: ./tf_modules
       - name: Terraform Apply
         id: apply
         run: terraform destroy --auto-approve
-        working-directory: ./modules
+        working-directory: ./tf_modules
