@@ -22,7 +22,7 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        working-directory: ./modules
+        working-directory: ./tf_modules
       - name: Terraform Validate
         id: validate
         run: terraform validate
