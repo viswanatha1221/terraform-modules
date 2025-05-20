@@ -1,70 +1,52 @@
-resource "aws_instance" "ec2_postgresql" {
-  ami                         = data.aws_ami.amazon-2.id
-  instance_type               = "t2.micro"
-  associate_public_ip_address = true
+locals {
+  create_instance_profile = module.this.enabled && try(length(var.instance_profile), 0) == 0
+  instance_profile        = local.create_instance_profile ? join("", aws_iam_instance_profile.default[*].name) : var.instance_profile
+  eip_enabled             = var.associate_public_ip_address && var.assign_eip_address && module.this.enabled
+  security_group_enabled  = module.this.enabled && var.sg_id
+  public_dns              = local.eip_enabled ? local.public_dns_rendered : join("", aws_instance.db-instance[*].public_dns)
+  public_dns_rendered = local.eip_enabled ? format("ec2-%s.%s.amazonaws.com",
+    replace(join("", aws_eip.default[*].public_ip), ".", "-"),
+    data.aws_region.default.name == "us-east-1" ? "compute-1" : format("%s.compute", data.aws_region.default.name)
+  ) : null
+  user_data_templated = templatefile("${path.module}/${var.user_data_template}", {
+    user_data   = join("\n", var.user_data)
+    ssm_enabled = var.ssm_enabled
+    ssh_user    = var.ssh_user
+  })
+}
+  
+resource "aws_instance" "db-instance" {
+  count                       = module.this.enabled ? 1 : 0
+  ami                         = coalesce(var.ami, join("", data.aws_ami.default[*].id))
+  instance_type               = var.instance_type
+  user_data                   = var.instances[count.index].user_data
   vpc_security_group_ids      = [var.sg_id]
-  subnet_id                   = var.subnets[0]
-  availability_zone           = data.aws_availability_zones.available.names[0]
+  iam_instance_profile        = local.instance_profile
+  associate_public_ip_address = var.associate_public_ip_address
+  subnet_id                   = var.subnets[count.index]
 
-  user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              amazon-linux-extras enable postgresql14
-              yum install -y postgresql-server
-              postgresql-setup initdb
-              systemctl enable postgresql
-              systemctl start postgresql
-              EOF
-
-  tags = {
-    Name = var.ec2_names[0]
+  root_block_device {
+    encrypted   = var.root_block_device_encrypted
+    volume_size = var.root_block_device_volume_size
   }
-}
 
-resource "aws_volume_attachment" "ebs_postgresql" {
-  device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.postgresql.id
-  instance_id = aws_instance.ec2_postgresql.id
-}
+  dynamic "ebs_block_device" {
+    for_each = var.ebs_block_device_volume_size > 0 ? [1] : []
 
-resource "aws_ebs_volume" "postgresql" {
-  availability_zone = data.aws_availability_zones.available.names[0]
-  size              = 1
-}
-
-
-resource "aws_instance" "ec2_redis" {
-  ami                         = data.aws_ami.amazon-2.id
-  instance_type               = "t2.micro"
-  associate_public_ip_address = true
-  vpc_security_group_ids      = [var.sg_id]
-  subnet_id                   = var.subnets[1]
-  availability_zone           = data.aws_availability_zones.available.names[1]
-
-  user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              amazon-linux-extras install epel -y
-              yum install -y redis
-              systemctl enable redis
-              systemctl start redis
-              sed -i 's/^bind 127.0.0.1 -::1/#bind 127.0.0.1 -::1/' /etc/redis/redis.conf
-              sed -i 's/protected-mode yes/protected-mode no/' /etc/redis/redis.conf
-              systemctl restart redis
-              EOF
-
-  tags = {
-    Name = var.ec2_names[1]
+    content {
+      encrypted             = var.ebs_block_device_encrypted
+      volume_size           = var.ebs_block_device_volume_size
+      delete_on_termination = var.ebs_delete_on_termination
+      device_name           = var.ebs_device_name
+      snapshot_id           = var.ebs_snapshot_id
+    }
   }
+
+  tags = module.this.tags
 }
 
-resource "aws_volume_attachment" "ebs_redis" {
-  device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.redis.id
-  instance_id = aws_instance.ec2_redis.id
-}
-
-resource "aws_ebs_volume" "redis" {
-  availability_zone = data.aws_availability_zones.available.names[1]
-  size              = 1
+resource "aws_eip" "default" {
+  count    = local.eip_enabled ? 1 : 0
+  instance = join("", aws_instance.db-instance[*].id)
+  tags     = module.this.tags
 }

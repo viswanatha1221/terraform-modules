@@ -1,24 +1,27 @@
 name: Terraform CI CD Pipeline for Deploying AWS Resources
 run-name: ${{ github.actor }} has triggered the pipeline
 
-on:
-  push:
-    branches:
-      - 'main'
-      - 'feature/*'
-      
+on: 
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: 'Target Environment'
         required: true
         default: ''
         type: choice
         options:
+           - ''
            - dev
            - stage
            - prod
-           
+      terraform_action:
+        description: 'Terraform_Action'
+        default: ''
+        type: choice
+        options:
+           - ''
+           - plan
+           - apply        
       TF_LOG:
         description: 'Terraform log level'
         required: true
@@ -41,32 +44,43 @@ jobs:
     name: terraform-ci-cd
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-      - name: Terraform Fmt
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
-      - name: Terraform Init
-        id: init
-        run: terraform init
-        working-directory: ${{ env.working-directory }}
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-        working-directory: ${{ env.working-directory }}
-      - name: Terraform Plan 
-        id: plan
-        run: terraform plan -out=tfplan -no-color
-        working-directory: ${{ env.working-directory }}
-      - name: Plan output
-        id: output
-        uses: actions/github-script@v3
-        if: github.event_name == 'pull_request'
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+    - name: Pre Build Checks
+      run: |
+        if [[ ${{ github.event.inputs.terraform_action }} == "plan" ]] && [[ $${{ github.event.inputs.terraform_folder }} == "prod" ]]; then
+            echo "::error ::Pre Build Checks Failed: Terraform Plan cant be run on Prod"
+            exit 1
+        elif [[  ${{ github.event.inputs.terraform_action }} == "apply" ]] && [[ ${{ github.ref }} != "refs/heads/main" ]]; then
+            echo "::error ::Pre Build Checks Failed: Terraform Apply can only be run on main branch"
+            exit 1
+        else
+            echo "::notice ::Pre Build Checks Passed"
+        fi
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+    - name: Terraform Fmt
+      id: fmt
+      run: terraform fmt -check
+      continue-on-error: true
+    - name: Terraform Init
+      id: init
+      run: terraform init
+      working-directory: ${{ env.working-directory }}
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate
+      working-directory: ${{ env.working-directory }}
+    - name: Terraform Plan 
+      id: plan
+      run: terraform plan -out=tfplan -no-color
+      working-directory: ${{ env.working-directory }}
+    - name: Plan output
+      id: output
+      uses: actions/github-script@v3
+      if: github.event_name == 'pull_request'
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -94,8 +108,8 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
-      - name: Terraform Apply
-        id: apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
-        working-directory: ${{ env.working-directory }}
+    - name: Terraform Apply
+      id: apply
+      if: github.ref == 'refs/heads/main' && github.event.inputs.terraform_action == 'apply'
+      run: terraform apply -auto-approve -input=false -no-color tfplan
+      working-directory: ${{ env.working-directory }}
