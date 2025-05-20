@@ -215,3 +215,34 @@ variable "instance_profile" {
   description = "A pre-defined profile to attach to the instance (default is to build our own)"
   default     = ""
 }
+
+variable "enabled" {
+  description = "Enable or disable resource creation"
+  type        = bool
+  default     = true
+}
+
+variable "tags" {
+  type = map(string)
+  default = {}
+}
+
+variable "name_prefix" {
+  type = list(object({
+  description = "Prefix to use in resource names"
+  type        = string
+  name        = string
+  }))
+  default     = [{
+      name    = "postgres"
+  },
+  {
+      name    = "redis"
+  }]
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+}
+

@@ -1,8 +1,8 @@
 locals {
-  create_instance_profile = module.this.enabled && try(length(var.instance_profile), 0) == 0
+  create_instance_profile = var.enabled && try(length(var.instance_profile), 0) == 0
   instance_profile        = local.create_instance_profile ? join("", aws_iam_instance_profile.default[*].name) : var.instance_profile
-  eip_enabled             = var.associate_public_ip_address && var.assign_eip_address && module.this.enabled
-  security_group_enabled  = module.this.enabled && var.sg_id
+  eip_enabled             = var.associate_public_ip_address && var.assign_eip_address && var.enabled
+  security_group_enabled  = var.enabled && var.sg_id
   public_dns              = local.eip_enabled ? local.public_dns_rendered : join("", aws_instance.db-instance[*].public_dns)
   public_dns_rendered = local.eip_enabled ? format("ec2-%s.%s.amazonaws.com",
     replace(join("", aws_eip.default[*].public_ip), ".", "-"),
@@ -16,7 +16,7 @@ locals {
 }
   
 resource "aws_instance" "db-instance" {
-  count                       = module.this.enabled ? 1 : 0
+  count                       = length(var.instances)
   ami                         = coalesce(var.ami, join("", data.aws_ami.default[*].id))
   instance_type               = var.instance_type
   user_data                   = var.instances[count.index].user_data
@@ -42,11 +42,11 @@ resource "aws_instance" "db-instance" {
     }
   }
 
-  tags = module.this.tags
+  tags = var.tags
 }
 
 resource "aws_eip" "default" {
   count    = local.eip_enabled ? 1 : 0
   instance = join("", aws_instance.db-instance[*].id)
-  tags     = module.this.tags
+  tags     = var.tags
 }

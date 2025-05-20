@@ -1,22 +1,28 @@
+locals {
+  instance_profile_name = "${var.name_prefix}-${var.environment}-instance-profile"
+  iam_role_name         = "${var.name_prefix}-${var.environment}-role"
+  iam_policy_name       = "${var.name_prefix}-${var.environment}-policy"
+}
+
 resource "aws_iam_instance_profile" "default" {
-  count = module.this.enabled && local.create_instance_profile ? 1 : 0
-  name  = module.this.id
+  count = var.enabled && local.create_instance_profile ? 1 : 0
+  name  = local.instance_profile_name
   role  = aws_iam_role.default[0].name
-  tags  = module.this.tags
+  tags  = var.tags
 }
 
 resource "aws_iam_role" "default" {
-  count = module.this.enabled && local.create_instance_profile ? 1 : 0
-  name  = module.this.id
+  count = var.enabled && local.create_instance_profile ? 1 : 0
+  name  = local.iam_role_name
   path  = "/"
-  tags  = module.this.tags
+  tags  = var.tags
 
   assume_role_policy = data.aws_iam_policy_document.default.json
 }
 
 resource "aws_iam_role_policy" "main" {
-  count  = module.this.enabled && local.create_instance_profile ? 1 : 0
-  name   = module.this.id
+  count  = var.enabled && local.create_instance_profile ? 1 : 0
+  name   = local.iam_policy_name
   role   = aws_iam_role.default[0].id
   policy = data.aws_iam_policy_document.main.json
 }
