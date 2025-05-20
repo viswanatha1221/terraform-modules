@@ -5,12 +5,34 @@ on:
   push:
     branches:
       - 'main'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: ''
+        type: choice
+        options:
+           - dev
+           - stage
+           - prod
+           
+      TF_LOG:
+        description: 'Terraform log level'
+        required: true
+        default: 'ERROR'
+        type: choice
+        options:
+          - TRACE
+          - DEBUG
+          - INFO
+          - ERROR
 
 env:
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  TF_LOG: DEBUG
-
+  TF_LOG: ${{ github.event.inputs.tf_log_level }}
+  
 jobs:
   build-infra:
     name: terraform-ci-cd
@@ -28,11 +50,11 @@ jobs:
         id: validate
         run: terraform validate
         working-directory: ./tf_modules
-      - name: Terraform Plan
+      - name: Terraform Plan 
         id: plan
-        run: terraform plan $TF_LOGS
+        run: terraform plan -var="environment=${{ github.event.inputs.environment }}" -out=tfplan
         working-directory: ./tf_modules
       - name: Terraform Apply
         id: apply
-        run: terraform destroy --auto-approve
+        run: terraform apply 
         working-directory: ./tf_modules
