@@ -5,12 +5,12 @@ module "vpc" {
 }
 
 module "sg" {
-  source = "./tf_modules/sg"
+  source = "./sg"
   vpc_id = module.vpc.vpc_id
 }
 
 module "ec2" {
-  source  = "./tf_modules/ec2"
+  source  = "./ec2"
   sg_id   = module.sg.sg_id
   subnets = module.vpc.subnet_ids
 }
