@@ -9,7 +9,8 @@ on:
 env:
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-TF_LOG=DEBUG
+  TF_LOG: DEBUG
+
 jobs:
   build-infra:
     name: terraform-ci-cd
