@@ -52,7 +52,7 @@ jobs:
         working-directory: ./tf_modules
       - name: Terraform Plan 
         id: plan
-        run: terraform plan -var="environment=${{ github.event.inputs.environment }}" -out=tfplan
+        run: terraform plan -out=tfplan
         working-directory: ./tf_modules
       - name: Terraform Apply
         id: apply
