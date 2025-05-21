@@ -3,3 +3,9 @@ variable "vpc_cidr" {
   type        = string
   default  = "10.0.0.0/16"
 }
+
+variable "postgres_key_name" {
+  description = "The EC2 key pair name to use"
+  type        = string
+  default     = "pd-key-name" # or leave this out to require it
+}
