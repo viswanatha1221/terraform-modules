@@ -16,7 +16,7 @@ on:
       TF_LOG:
         description: 'Terraform log level'
         required: true
-        default: ''
+        default: 'DEBUG'
         type: choice
         options:
           - TRACE
