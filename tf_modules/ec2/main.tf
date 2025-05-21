@@ -1,9 +1,19 @@
+resource "aws_instance" "bastion" {
+  ami                         = data.aws_ami.amazon-2.id
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.public[0].id
+  vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
+  associate_public_ip_address = true
+  tags = {
+    Name = "BastionHost"
+  }
+}
+
 resource "aws_instance" "ec2_postgresql" {
   ami                         = data.aws_ami.amazon-2.id
   instance_type               = "t2.micro"
-  associate_public_ip_address = true
-  vpc_security_group_ids      = [var.sg_id]
-  subnet_id                   = var.subnets[0]
+  vpc_security_group_ids      = [aws_security_group.private_sg.id]
+  subnet_id                   = aws_subnet.private[0].id
   availability_zone           = data.aws_availability_zones.available.names[0]
   iam_instance_profile        = aws_iam_instance_profile.postgresql_profile.name
   user_data = <<-EOF
@@ -23,6 +33,7 @@ resource "aws_instance" "ec2_postgresql" {
 
 resource "aws_volume_attachment" "ebs_postgresql" {
   device_name = "/dev/sdh"
+  depends_on  = [aws_instance.ec2_postgresql, aws_ebs_volume.postgresql]
   volume_id   = aws_ebs_volume.postgresql.id
   instance_id = aws_instance.ec2_postgresql.id
 }
@@ -35,9 +46,8 @@ resource "aws_ebs_volume" "postgresql" {
 resource "aws_instance" "ec2_redis" {
   ami                         = data.aws_ami.amazon-2.id
   instance_type               = "t2.micro"
-  associate_public_ip_address = true
-  vpc_security_group_ids      = [var.sg_id]
-  subnet_id                   = var.subnets[1]
+  vpc_security_group_ids      = [aws_security_group.private_sg.id]
+  subnet_id                   = aws_subnet.private[1].id
   availability_zone           = data.aws_availability_zones.available.names[1]
   iam_instance_profile        = aws_iam_instance_profile.redis_profile.name
   user_data = <<-EOF
@@ -59,6 +69,7 @@ resource "aws_instance" "ec2_redis" {
 
 resource "aws_volume_attachment" "ebs_redis" {
   device_name = "/dev/sdh"
+  depends_on = [aws_instance.ec2_redis, aws_ebs_volume.redis]
   volume_id   = aws_ebs_volume.redis.id
   instance_id = aws_instance.ec2_redis.id
 }
