@@ -25,9 +25,15 @@ variable "private_subnet_ids" {
   type = list(string)
 }
 
-variable "key_name" {
+variable "postgres_key_name" {
   description = "The EC2 key pair name"
   type        = string
-  default     = "my-key-name"
+  default     = "pd-key-name"
+}
+
+variable "redis_key_name" {
+  description = "The EC2 key pair name"
+  type        = string
+  default     = "rs-key-name"
 }
 
