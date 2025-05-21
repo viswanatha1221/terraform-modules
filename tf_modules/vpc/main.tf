@@ -61,4 +61,5 @@ resource "aws_vpc_endpoint" "ssm" {
   vpc_id       = aws_vpc.my_vpc.id
   service_name = "com.amazonaws.us-west-1.ssm"
   subnet_ids   = aws_subnet.private[*].id
+  vpc_endpoint_type = "Interface"
 }
