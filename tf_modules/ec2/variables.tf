@@ -26,6 +26,8 @@ variable "private_subnet_ids" {
 }
 
 variable "key_name" {
-  description = "Name of the existing EC2 Key Pair"
+  description = "The EC2 key pair name"
   type        = string
+  default     = "my-key-name"
 }
+
