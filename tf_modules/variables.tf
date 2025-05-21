@@ -9,3 +9,9 @@ variable "postgres_key_name" {
   type        = string
   default     = "pd-key-name" # or leave this out to require it
 }
+
+variable "redis_key_name" {
+  description = "The EC2 key pair name to use"
+  type        = string
+  default     = "rs-key-name" # or leave this out to require it
+}
