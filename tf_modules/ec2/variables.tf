@@ -28,12 +28,10 @@ variable "private_subnet_ids" {
 variable "postgres_key_name" {
   description = "The EC2 key pair name"
   type        = string
-  default     = "pd-key-name"
 }
 
 variable "redis_key_name" {
   description = "The EC2 key pair name"
   type        = string
-  default     = "rs-key-name"
 }
 
