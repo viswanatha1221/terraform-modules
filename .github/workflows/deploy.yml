@@ -90,6 +90,6 @@ jobs:
             })
     - name: Terraform Apply
       id: apply
-      if: github.ref == 'refs/heads/main' && github.event.inputs.terraform_action == 'apply'
+      #if: github.ref == 'refs/heads/main' && github.event.inputs.terraform_action == 'apply'
       run: terraform apply -auto-approve -input=false -no-color tfplan
       working-directory: ${{ env.working-directory }}
