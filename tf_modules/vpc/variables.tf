@@ -13,3 +13,8 @@ variable "private_subnet_cidr" {
   type = list(string)
   default = ["10.0.3.0/24", "10.0.4.0/24"]
 }
+
+variable "private_subnet_names" {
+  type    = list(string)
+  default = ["private-subnet-1", "private-subnet-2"]
+}
