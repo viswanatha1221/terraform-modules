@@ -98,5 +98,6 @@ jobs:
 
     - name: Terraform destroy
       id: destroy
+      if: github.ref == 'refs/heads/main' && github.event.inputs.terraform_action == 'destroy'
       run: terraform destroy --auto-approve
       working-directory: ${{ env.working-directory }}
