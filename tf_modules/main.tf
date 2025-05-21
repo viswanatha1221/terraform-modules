@@ -15,6 +15,8 @@ module "ec2" {
   public_subnet_ids    = module.vpc.public_subnet_ids
   private_subnet_ids   = module.vpc.private_subnet_ids
   s3_bucket_arn        = module.s3.bucket_arn
+  postgres_key_name    = var.postgres_key_name
+  redis_key_name       = var.redis_key_name
 }
 
 module "s3" {
