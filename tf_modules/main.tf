@@ -11,9 +11,11 @@ module "sg" {
 
 module "ec2" {
   source  = "./ec2"
-  sg_id   = module.sg.sg_id
-  subnets = module.vpc.subnet_ids
-  s3_bucket_arn = module.s3.bucket_arn
+  bastion_sg_id        = module.sg.bastion_sg_id
+  private_sg_id        = module.sg.private_sg_id
+  public_subnet_ids    = module.vpc.public_subnet_ids
+  private_subnet_ids   = module.vpc.private_subnet_ids
+  s3_bucket_arn        = module.s3.bucket_arn
 }
 
 module "s3" {

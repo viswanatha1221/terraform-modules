@@ -1,8 +1,8 @@
 resource "aws_instance" "bastion" {
   ami                         = data.aws_ami.amazon-2.id
   instance_type               = "t2.micro"
-  subnet_id                   = aws_subnet.public[0].id
-  vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
+  subnet_id                   = var.public_subnet_ids[0]
+  vpc_security_group_ids      = [var.bastion_sg_id]
   associate_public_ip_address = true
   tags = {
     Name = "BastionHost"
@@ -12,8 +12,8 @@ resource "aws_instance" "bastion" {
 resource "aws_instance" "ec2_postgresql" {
   ami                         = data.aws_ami.amazon-2.id
   instance_type               = "t2.micro"
-  vpc_security_group_ids      = [aws_security_group.private_sg.id]
-  subnet_id                   = aws_subnet.private[0].id
+  vpc_security_group_ids      = [var.private_sg_id]
+  subnet_id                   = var.private_subnet_ids[0]
   availability_zone           = data.aws_availability_zones.available.names[0]
   iam_instance_profile        = aws_iam_instance_profile.postgresql_profile.name
   user_data = <<-EOF
@@ -46,8 +46,8 @@ resource "aws_ebs_volume" "postgresql" {
 resource "aws_instance" "ec2_redis" {
   ami                         = data.aws_ami.amazon-2.id
   instance_type               = "t2.micro"
-  vpc_security_group_ids      = [aws_security_group.private_sg.id]
-  subnet_id                   = aws_subnet.private[1].id
+  vpc_security_group_ids      = [var.private_sg_id]
+  subnet_id                   = var.private_subnet_ids[1]
   availability_zone           = data.aws_availability_zones.available.names[1]
   iam_instance_profile        = aws_iam_instance_profile.redis_profile.name
   user_data = <<-EOF
