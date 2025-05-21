@@ -4,9 +4,32 @@ resource "aws_instance" "bastion" {
   subnet_id                   = var.public_subnet_ids[0]
   vpc_security_group_ids      = [var.bastion_sg_id]
   associate_public_ip_address = true
+  iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
   tags = {
     Name = "BastionHost"
   }
+}
+
+resource "aws_iam_role" "bastion_role" {
+  name = "ec2_bastion_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_instance_profile" "bastion_profile" {
+  name = "ec2_bastion_profile"
+  role = aws_iam_role.bastion_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_bastion" {
+  role       = aws_iam_role.bastion_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_instance" "ec2_postgresql" {
@@ -29,6 +52,11 @@ resource "aws_instance" "ec2_postgresql" {
   tags = {
     Name = var.ec2_names[0]
   }
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_postgresql" {
+  role       = aws_iam_role.postgresql_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_volume_attachment" "ebs_postgresql" {
@@ -65,6 +93,11 @@ resource "aws_instance" "ec2_redis" {
   tags = {
     Name = var.ec2_names[1]
   }
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_redis" {
+  role       = aws_iam_role.redis_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_volume_attachment" "ebs_redis" {
