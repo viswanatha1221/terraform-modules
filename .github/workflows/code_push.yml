@@ -31,11 +31,11 @@ jobs:
         ssh -i bastion_key.pem -o StrictHostKeyChecking=no \
         ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} << 'EOF'
           # Forward the archive to the private EC2
-          scp -i /home/ec2-user/private_key.pem -o StrictHostKeyChecking=no /tmp/app.tar.gz \
+          scp -i /home/ec2-user/pd-key-name.pem -o StrictHostKeyChecking=no /tmp/app.tar.gz \
           ${{ secrets.PRIVATE_USER }}@${{ secrets.PRIVATE_IP }}:/tmp/
 
           # Extract the archive into /apps directory
-          ssh -i /home/ec2-user/private_key.pem -o StrictHostKeyChecking=no \
+          ssh -i /home/ec2-user/pd-key-name.pem -o StrictHostKeyChecking=no \
           ${{ secrets.PRIVATE_USER }}@${{ secrets.PRIVATE_IP }} \
           "sudo mkdir -p /apps && sudo tar -xzf /tmp/app.tar.gz -C /apps && sudo chown -R $USER:$USER /apps"
         EOF
