@@ -1,4 +1,4 @@
-data "aws_ami" "amazon-2" {
+data "aws_ami" "windows" {
   most_recent = true
 
   filter {

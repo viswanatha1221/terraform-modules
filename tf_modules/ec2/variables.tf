@@ -35,3 +35,7 @@ variable "redis_key_name" {
   type        = string
 }
 
+variable "jumpkey"{
+ description=" The Bastion key pair name"
+ type = string
+}

@@ -1,10 +1,11 @@
 resource "aws_instance" "bastion" {
-  ami                         = data.aws_ami.amazon-2.id
+  ami                         = data.aws_ami.windows.id
   instance_type               = "t2.micro"
   subnet_id                   = var.public_subnet_ids[0]
   vpc_security_group_ids      = [var.bastion_sg_id]
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
+  key_name    = var.jumpkey
   tags = {
     Name = "BastionHost"
   }
@@ -39,6 +40,7 @@ resource "aws_instance" "ec2_postgresql" {
   subnet_id                   = var.private_subnet_ids[0]
   availability_zone           = data.aws_availability_zones.available.names[0]
   iam_instance_profile        = aws_iam_instance_profile.postgresql_profile.name
+  key_name                    = var.postgres_key_name
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
@@ -78,6 +80,7 @@ resource "aws_instance" "ec2_redis" {
   subnet_id                   = var.private_subnet_ids[1]
   availability_zone           = data.aws_availability_zones.available.names[1]
   iam_instance_profile        = aws_iam_instance_profile.redis_profile.name
+  key_name                    = var.redis_key_name
   user_data = <<-EOF
               #!/bin/bash
               yum update -y

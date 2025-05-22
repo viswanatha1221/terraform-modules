@@ -17,6 +17,7 @@ module "ec2" {
   s3_bucket_arn        = module.s3.bucket_arn
   postgres_key_name    = var.postgres_key_name
   redis_key_name       = var.redis_key_name
+  jumpkey = var.jumpkey
 }
 
 module "s3" {

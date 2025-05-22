@@ -15,3 +15,9 @@ variable "redis_key_name" {
   type        = string
   default     = "rs-key-name" # or leave this out to require it
 }
+
+variable "jumpkey" {
+  description = "The Bastion key pair name"
+  type        = string
+  default     = "jumpkey" # or leave this out to require it
+}
