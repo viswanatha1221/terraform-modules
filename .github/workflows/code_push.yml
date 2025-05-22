@@ -2,8 +2,7 @@ name: Deploy to Private EC2 via Bastion
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   deploy:
@@ -13,17 +12,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Setup SSH key
+    - name: Setup Bastion Key
       run: |
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
-        chmod 600 key.pem
+        echo "${{ secrets.BASTION_KEY }}" > bastion_key.pem
+        chmod 600 bastion_key.pem
 
-    - name: SSH into Bastion and push to private EC2
+    - name: Upload code to Bastion
       run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} << 'EOF'
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.TARGET_USER }}@${{ secrets.TARGET_PRIVATE_IP }} << 'INNER'
-            mkdir -p ~/apps
-            exit
-          INNER
-          scp -i key.pem -r $GITHUB_WORKSPACE/* ${{ secrets.TARGET_USER }}@${{ secrets.TARGET_PRIVATE_IP }}:~/apps/
+        scp -i bastion_key.pem -o StrictHostKeyChecking=no -r . \
+        ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }}:/tmp/app
+
+    - name: SSH into Bastion and forward to Private EC2
+      run: |
+        ssh -i bastion_key.pem -o StrictHostKeyChecking=no \
+        ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} << 'EOF'
+          # Inside Bastion: Forward to Private EC2
+          scp -i /apps/pd-key-name.pem -o StrictHostKeyChecking=no -r /tmp/app \
+          ${{ secrets.PRIVATE_USER }}@${{ secrets.PRIVATE_IP }}:/home/${{ secrets.PRIVATE_USER }}/app
         EOF
