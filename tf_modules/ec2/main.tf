@@ -87,8 +87,8 @@ resource "aws_instance" "ec2_redis" {
               yum install -y redis
               systemctl enable redis
               systemctl start redis
-              sed -i 's/^bind 127.0.0.1 -::1/#bind 127.0.0.1 -::1/' /etc/redis/redis.conf
-              sed -i 's/protected-mode yes/protected-mode no/' /etc/redis/redis.conf
+              sed -i 's/^bind 127.0.0.1 -::1/#bind 127.0.0.1 -::1/' /etc/redis.conf
+              sed -i 's/protected-mode yes/protected-mode no/' /etc/redis.conf
               systemctl restart redis
               EOF
 
