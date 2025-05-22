@@ -9,6 +9,13 @@ resource "aws_security_group" "bastion_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] # Replace with your IP
   }
+  
+  ingress {
+  from_port   = 3389
+  to_port     = 3389
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"] # Replace with your IP
+  }
 
   egress {
     from_port   = 0
