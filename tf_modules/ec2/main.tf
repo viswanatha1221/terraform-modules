@@ -39,7 +39,6 @@ resource "aws_instance" "ec2_postgresql" {
   subnet_id                   = var.private_subnet_ids[0]
   availability_zone           = data.aws_availability_zones.available.names[0]
   iam_instance_profile        = aws_iam_instance_profile.postgresql_profile.name
-  key_name                    = var.postgres_key_name   # <-- Add this line
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
@@ -79,7 +78,6 @@ resource "aws_instance" "ec2_redis" {
   subnet_id                   = var.private_subnet_ids[1]
   availability_zone           = data.aws_availability_zones.available.names[1]
   iam_instance_profile        = aws_iam_instance_profile.redis_profile.name
-  key_name                    = var.redis_key_name   # <-- Add this line
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
@@ -87,8 +85,8 @@ resource "aws_instance" "ec2_redis" {
               yum install -y redis
               systemctl enable redis
               systemctl start redis
-              sed -i 's/^bind 127.0.0.1 -::1/#bind 127.0.0.1 -::1/' /etc/redis.conf
-              sed -i 's/protected-mode yes/protected-mode no/' /etc/redis.conf
+              sed -i 's/^bind 127.0.0.1 -::1/#bind 127.0.0.1 -::1/' /etc/redis/redis.conf
+              sed -i 's/protected-mode yes/protected-mode no/' /etc/redis/redis.conf
               systemctl restart redis
               EOF
 
@@ -180,90 +178,3 @@ resource "aws_iam_role_policy_attachment" "ec2_attach_policy_redis" {
   role       = aws_iam_role.redis_role.name
   policy_arn = aws_iam_policy.s3_access_policy.arn
 }
-
-resource "aws_eip" "nat" {
-  vpc = true
-}
-
-resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public[0].id
-  depends_on    = [aws_internet_gateway.igw]
-}
-
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.my_vpc.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat.id
-  }
-
-  tags = {
-    Name = "PrivateRouteTable"
-  }
-}
-
-resource "aws_route_table_association" "private" {
-  count          = length(aws_subnet.private)
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private.id
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
