@@ -22,8 +22,8 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} << 'EOF'
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.TARGET_USER }}@${{ secrets.TARGET_PRIVATE_IP }} << 'INNER'
-            mkdir -p ~/app
+            mkdir -p ~/apps
             exit
           INNER
-          scp -i key.pem -r $GITHUB_WORKSPACE/* ${{ secrets.TARGET_USER }}@${{ secrets.TARGET_PRIVATE_IP }}:~/app/
+          scp -i key.pem -r $GITHUB_WORKSPACE/* ${{ secrets.TARGET_USER }}@${{ secrets.TARGET_PRIVATE_IP }}:~/apps/
         EOF
