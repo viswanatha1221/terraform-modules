@@ -37,29 +37,26 @@ resource "aws_subnet" "private" {
   }
 }
 
-# Route Table
-resource "aws_route_table" "rt" {
+resource "aws_eip" "nat" {
+}
+
+resource "aws_nat_gateway" "nat" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public[0].id
+  depends_on    = [aws_internet_gateway.igw]
+}
+
+resource "aws_route_table" "private" {
   vpc_id = aws_vpc.my_vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0" # public 
-    gateway_id = aws_internet_gateway.igw.id
-  }
-
-  tags = {
-    Name = "MyRouteTable"
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat.id
   }
 }
 
-# Route Table Association
-resource "aws_route_table_association" "rta" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.rt.id
-}
-
-resource "aws_vpc_endpoint" "ssm" {
-  vpc_id       = aws_vpc.my_vpc.id
-  service_name = "com.amazonaws.us-west-1.ssm"
-  subnet_ids   = aws_subnet.private[*].id
-  vpc_endpoint_type = "Interface"
+resource "aws_route_table_association" "private" {
+  count          = length(aws_subnet.private)
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private.id
 }

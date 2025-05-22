@@ -180,3 +180,90 @@ resource "aws_iam_role_policy_attachment" "ec2_attach_policy_redis" {
   role       = aws_iam_role.redis_role.name
   policy_arn = aws_iam_policy.s3_access_policy.arn
 }
+
+resource "aws_eip" "nat" {
+  vpc = true
+}
+
+resource "aws_nat_gateway" "nat" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public[0].id
+  depends_on    = [aws_internet_gateway.igw]
+}
+
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.my_vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat.id
+  }
+
+  tags = {
+    Name = "PrivateRouteTable"
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  count          = length(aws_subnet.private)
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private.id
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
