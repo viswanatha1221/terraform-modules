@@ -27,6 +27,6 @@ jobs:
         ssh -i bastion_key.pem -o StrictHostKeyChecking=no \
         ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} << 'EOF'
           # Inside Bastion: Forward to Private EC2
-          scp -i /apps/pd-key-name.pem -o StrictHostKeyChecking=no -r /tmp/app \
-          ${{ secrets.PRIVATE_USER }}@${{ secrets.PRIVATE_IP }}:/home/${{ secrets.PRIVATE_USER }}/app
+          scp -i /home/ec2-user/pd-key-name.pem -o StrictHostKeyChecking=no -r /tmp/app \
+          ${{ secrets.PRIVATE_USER }}@${{ secrets.PRIVATE_IP }}:/home/${{ secrets.PRIVATE_USER }}/apps
         EOF
