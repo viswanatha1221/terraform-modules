@@ -1,0 +1,29 @@
+name: Deploy to Private EC2 via Bastion
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup SSH key
+      run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
+        chmod 600 key.pem
+
+    - name: SSH into Bastion and push to private EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.TARGET_USER }}@${{ secrets.TARGET_PRIVATE_IP }} << 'INNER'
+            mkdir -p ~/app
+            exit
+          INNER
+          scp -i key.pem -r $GITHUB_WORKSPACE/* ${{ secrets.TARGET_USER }}@${{ secrets.TARGET_PRIVATE_IP }}:~/app/
+        EOF
