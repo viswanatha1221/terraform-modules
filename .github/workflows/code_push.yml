@@ -19,7 +19,7 @@ jobs:
 
     - name: Archive code excluding unwanted files
       run: |
-        tar --exclude='.git' --exclude='.github' --exclude='.DS_Store' -czf app.tar.gz .
+        tar --exclude='.git' --exclude='.github' --exclude='.DS_Store' -czf app.tar.gz . || true
 
     - name: Copy archive to Bastion
       run: |
