@@ -3,7 +3,7 @@ data "aws_ami" "windows" {
 
   filter {
     name = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-ebs"]
+    values = ["Windows_Server-2019-English-Full-Base-*"]
   }
 
   filter {
