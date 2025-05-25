@@ -220,3 +220,14 @@ Use AWS Secrets Manager and KMS for secure credential and key management
 
 This setup provides a robust foundation for secure, compliant, and scalable cloud infrastructure provisioning.
 
+|---------------------------|----------------------------------------------|
+| Tool/Service              | Purpose                                      |
+|---------------------------|----------------------------------------------|
+| Checkov / tfsec           | Static code analysis for Terraform           |
+| AWS Config                | Detect and remediate misconfigurations       |
+| AWS IAM Access Analyzer   | Detect overly permissive IAM policies        |
+| KMS + Secrets Manager     | Key and secret lifecycle management          |
+| AWS Organizations SCPs    | Enforce guardrails across accounts           |
+| AWS CloudTrail + GuardDuty| Monitoring & threat detection                |
+|---------------------------|----------------------------------------------|
+
