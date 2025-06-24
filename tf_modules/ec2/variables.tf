@@ -4,11 +4,6 @@ variable "ec2_names" {
     default = ["postgresql-node", "redis-node"]
 }
 
-variable "s3_bucket_arn" {
-  type        = string
-  description = "ARN of the S3 bucket"
-}
-
 variable "bastion_sg_id" {
   type = string
 }
@@ -30,12 +25,18 @@ variable "postgres_key_name" {
   type        = string
 }
 
-variable "redis_key_name" {
-  description = "The EC2 key pair name"
-  type        = string
-}
-
 variable "jumpkey"{
  description=" The Bastion key pair name"
  type = string
+}
+
+variable "env" {
+  description = "Environment name"
+  type        = string
+}
+
+variable "project" {
+  description = "Project name"
+  type        = string
+  default     = [edms]
 }
