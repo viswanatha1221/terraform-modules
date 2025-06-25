@@ -33,7 +33,7 @@ on:
 
 env:
   TF_LOG: ${{ github.event.inputs.tf_log_level }}
-  working-directory: "env/${{ github.event.inputs.environment }}"
+  working-directory: "/env/${{ github.event.inputs.environment }}"
   AWS_ACCESS_KEY_ID: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_ACCESS_KEY_DEV || secrets.AWS_ACCESS_KEY_STAGE }}
   AWS_SECRET_ACCESS_KEY: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_SECRET_ACCESS_KEY_DEV || secrets.AWS_SECRET_ACCESS_KEY_STAGE }}
       
@@ -67,7 +67,7 @@ jobs:
       working-directory: ${{ env.working-directory }}
     - name: Terraform Plan 
       id: plan
-      run: terraform plan -out=tfplan -no-color -var-file="../env/${{ github.event.inputs.environment }}/${{ github.event.inputs.environment }}.tfvars" $TF_LOG
+      run: terraform plan -out=tfplan -no-color -var-file="${{ github.event.inputs.environment }}.tfvars" $TF_LOG
       working-directory: ${{ env.working-directory }}
     - name: Plan output
       id: output
