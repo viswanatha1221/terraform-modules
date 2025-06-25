@@ -2,7 +2,6 @@ name: Terraform CI CD Pipeline for Deploying AWS Resources
 run-name: ${{ github.actor }} has triggered the pipeline
 
 on: 
-    
   workflow_dispatch:
     inputs:
       environment:
@@ -33,10 +32,9 @@ on:
           - ERROR
 
 env:
-  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #TF_LOG: ${{ github.event.inputs.tf_log_level }}
-  TF_LOG: DEBUG
+  AWS_ACCESS_KEY: ${{  secrets[format('AWS_ACCESS_KEY_{0}', github.event.inputs.environment | upper)] }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', github.event.inputs.environment | upper)] }}
+  TF_LOG: ${{ github.event.inputs.tf_log_level }}
   working-directory: ./tf_modules
   
 jobs:
@@ -62,7 +60,7 @@ jobs:
       working-directory: ${{ env.working-directory }}
     - name: Terraform Plan 
       id: plan
-      run: terraform plan -out=tfplan -no-color $TF_LOG -var-file="../env/${{ github.event.inputs.environment }}/${{ github.event.inputs.environment }}.tfvars"
+      run: terraform plan -out=tfplan -no-color -var-file="../env/${{ github.event.inputs.environment }}/${{ github.event.inputs.environment }}.tfvars" $TF_LOG
       working-directory: ${{ env.working-directory }}
     - name: Plan output
       id: output
