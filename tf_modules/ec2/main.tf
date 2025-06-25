@@ -25,7 +25,7 @@ resource "aws_instance" "private_host" {
   key_name               = "${var.env}_key"
 
   tags = {
-    Name        = "${var.env}-${var.project}-local.private_host_names[count.index]"
+    Name        = "${var.env}-${var.project}-${local.private_host_names[count.index]}"
   }
 }
 
