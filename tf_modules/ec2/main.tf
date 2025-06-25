@@ -32,7 +32,7 @@ resource "aws_instance" "private_host" {
 resource "aws_volume_attachment" "ebs" {
   count       = length(local.private_host_names)
   device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.ebs.id
+  volume_id   = aws_ebs_volume.ebs[count.index].id
   instance_id = aws_instance.private_host[count.index].id
   }
 
