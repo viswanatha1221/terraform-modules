@@ -18,8 +18,6 @@ module "ec2" {
   private_sg_id      = module.sg.private_sg_id
   public_subnet_ids  = module.vpc.public_subnet_id
   private_subnet_ids = module.vpc.private_subnet_ids
-  postgres_key_name  = var.stage_key
-  jumpkey            = var.stage_jumpkey
 }
 
 module "s3" {
