@@ -33,7 +33,7 @@ on:
 
 env:
   TF_LOG: ${{ github.event.inputs.tf_log_level }}
-  working-directory: "../envs/${{ github.event.inputs.environment }}"
+  working-directory: "env/${{ github.event.inputs.environment }}"
   
 jobs:
   build-infra:
@@ -65,13 +65,15 @@ jobs:
       id: init
       run: terraform init
       working-directory: ${{ env.working-directory }}
+    - name: List files
+      run: ls -R
     - name: Terraform Validate
       id: validate
       run: terraform validate
       working-directory: ${{ env.working-directory }}
     - name: Terraform Plan 
       id: plan
-      run: terraform plan -out=tfplan -no-color -var-file="../envs/${{ github.event.inputs.environment }}/${{ github.event.inputs.environment }}.tfvars" $TF_LOG
+      run: terraform plan -out=tfplan -no-color -var-file="../env/${{ github.event.inputs.environment }}/${{ github.event.inputs.environment }}.tfvars" $TF_LOG
       working-directory: ${{ env.working-directory }}
     - name: Plan output
       id: output
