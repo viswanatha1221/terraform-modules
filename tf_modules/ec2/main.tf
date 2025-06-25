@@ -4,7 +4,7 @@ locals {
 resource "aws_instance" "bastion" {
   ami                         = data.aws_ami.windows.id
   instance_type               = "t2.micro"
-  subnet_id                   = aws_subnet.public.id
+  subnet_id                   = var.public_subnet_id
   vpc_security_group_ids      = [var.bastion_sg_id]
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
@@ -18,7 +18,7 @@ resource "aws_instance" "private_host" {
   count                  = length(local.private_host_names)
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t2.micro"
-  subnet_id              = aws_subnet.private[count.index].id
+  subnet_id              = var.private_subnet_ids[count.index]
   associate_public_ip_address = false
   vpc_security_group_ids = [var.private_sg_id]
   iam_instance_profile   = aws_iam_instance_profile.db_profile.name
