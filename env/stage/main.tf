@@ -16,7 +16,7 @@ module "ec2" {
   env                = var.env
   bastion_sg_id      = module.sg.bastion_sg_id
   private_sg_id      = module.sg.private_sg_id
-  public_subnet_ids  = module.vpc.public_subnet_id
+  public_subnet_ids  = module.vpc.public_subnet_ids
   private_subnet_ids = module.vpc.private_subnet_ids
 }
 
