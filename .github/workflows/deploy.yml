@@ -32,8 +32,8 @@ on:
           - ERROR
 
 env:
-  AWS_ACCESS_KEY: ${{  secrets[format('AWS_ACCESS_KEY_{0}', github.event.inputs.environment | upper)] }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', github.event.inputs.environment | upper)] }}
+  AWS_ACCESS_KEY: ${{ secrets[format('AWS_ACCESS_KEY_%s', toUpper(github.event.inputs.environment))] }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_%s', toUpper(github.event.inputs.environment))] }}
   TF_LOG: ${{ github.event.inputs.tf_log_level }}
   working-directory: ./tf_modules
   
