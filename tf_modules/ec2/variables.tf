@@ -17,7 +17,7 @@ variable "public_subnet_ids" {
 }
 
 variable "private_subnet_ids" {
-  type = list(string)
+  type = string
 }
 
 variable "postgres_key_name" {
@@ -38,12 +38,4 @@ variable "env" {
 variable "project" {
   description = "Project name"
   type        = string
-}
-
-variable "public_subnet_id" {
-  type = string
-}
-
-variable "private_subnet_ids" {
-  type = list(string)
 }
