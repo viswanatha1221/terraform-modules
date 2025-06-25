@@ -3,12 +3,12 @@ variable "vpc_cidr" {
   type        = string
 }
 
-variable "postgres_key_name" {
+variable "stage_key" {
   description = "The EC2 key pair name to use"
   type        = string
 }
 
-variable "jumpkey" {
+variable "stage_jumpkey" {
   description = "The Bastion key pair name"
   type        = string
 }

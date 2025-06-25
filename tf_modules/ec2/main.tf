@@ -8,7 +8,7 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids      = [var.bastion_sg_id]
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
-  key_name    = var.jumpkey
+  key_name    = "${var.env}_jumpkey"
   tags = {
     Name = "BastionHost"
   }
@@ -22,7 +22,7 @@ resource "aws_instance" "private_host" {
   associate_public_ip_address = false
   vpc_security_group_ids = [var.private_sg_id]
   iam_instance_profile   = aws_iam_instance_profile.db_profile.name
-  key_name               = var.postgres_key_name
+  key_name               = "${var.env}_key"
 
   tags = {
     Name        = "${var.env}-${var.project}-local.private_host_names[count.index]"
