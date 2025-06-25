@@ -61,8 +61,6 @@ jobs:
       id: init
       run: terraform init
       working-directory: ${{ env.working-directory }}
-    - name: List files
-      run: ls -R
     - name: Terraform Validate
       id: validate
       run: terraform validate
