@@ -16,7 +16,7 @@ resource "aws_instance" "bastion" {
 
 resource "aws_instance" "private_host" {
   count                  = length(local.private_host_names)
-  ami                    = data.aws_ami.amazon-2.id
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.private[count.index].id
   vpc_security_group_ids = [var.private_sg_id]

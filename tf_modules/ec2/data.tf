@@ -14,12 +14,12 @@ data "aws_ami" "windows" {
   owners = ["amazon"]
 }
 
-data "aws_ami" "amazon-2" {
+data "aws_ami" "ubuntu" {
   most_recent = true
 
   filter {
     name = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-ebs"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
 
   filter {
@@ -27,7 +27,7 @@ data "aws_ami" "amazon-2" {
     values = ["hvm"]
   }
 
-  owners = ["amazon"]
+  owners = ["ubuntu"]
 }
 
 data "aws_availability_zones" "available" {

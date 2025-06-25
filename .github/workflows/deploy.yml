@@ -5,6 +5,14 @@ on:
     
   workflow_dispatch:
     inputs:
+      environment:
+        description: 'Environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - stage
       terraform_action:
         description: 'Terraform_Action'
         default: ''
@@ -54,7 +62,7 @@ jobs:
       working-directory: ${{ env.working-directory }}
     - name: Terraform Plan 
       id: plan
-      run: terraform plan -out=tfplan -no-color $TF_LOG
+      run: terraform plan -out=tfplan -no-color $TF_LOG -var-file="../env/${{ github.event.inputs.environment }}/${{ github.event.inputs.environment }}.tfvars"
       working-directory: ${{ env.working-directory }}
     - name: Plan output
       id: output

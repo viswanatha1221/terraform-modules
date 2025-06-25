@@ -7,8 +7,8 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "terraform-backend-ed-s3"
-    key    = "test/terraform.tfstate"
+    bucket = "tf-backend-stage-ed-s3"
+    key    = "stage-test/terraform.tfstate"
     region = "us-east-2"
   }
 }
