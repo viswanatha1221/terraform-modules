@@ -13,6 +13,14 @@ resource "aws_instance" "bastion" {
     Name = "BastionHost"
   }
 }
+resource "aws_eip" "bastion_eip" {
+  depends_on = [aws_instance.bastion]
+}
+
+resource "aws_eip_association" "bastion_assoc" {
+  instance_id   = aws_instance.bastion.id
+  allocation_id = aws_eip.bastion_eip.id
+}
 
 resource "aws_instance" "private_host" {
   count                  = length(local.private_host_names)
@@ -39,7 +47,7 @@ resource "aws_volume_attachment" "ebs" {
 resource "aws_ebs_volume" "ebs" {
   count       = length(local.private_host_names)
   availability_zone = aws_instance.private_host[count.index].availability_zone
-  size              = 3
+  size              = 30
   type              = "gp2"
   tags = {
     Name = "EBSVolume"

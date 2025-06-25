@@ -27,5 +27,11 @@ module "s3" {
 
 module "alb" {
   source         = "../../tf_modules/alb"
-  vpc_id         = module.vpc.vpc_id       
-}
+  vpc_id         = module.vpc.vpc_id  
+  public_subnet_id   = module.vpc.public_subnet_ids[0]
+  private_subnet_ids = module.vpc.private_subnet_ids
+  private_sg_id      = module.sg.private_sg_id
+  private_host_names = module.ec2.private_host_names
+  target_ids         = module.ec2.private_host_ids
+
+} 
