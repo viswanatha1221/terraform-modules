@@ -27,7 +27,7 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["ubuntu"]
+  owners = ["amazon"]
 }
 
 data "aws_availability_zones" "available" {
