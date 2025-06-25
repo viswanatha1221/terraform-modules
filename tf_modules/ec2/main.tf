@@ -3,7 +3,7 @@ locals {
 }
 resource "aws_instance" "bastion" {
   ami                         = data.aws_ami.windows.id
-  instance_type               = "t2.micro"
+  instance_type               = "t2.medium"
   subnet_id                   = var.public_subnet_id
   vpc_security_group_ids      = [var.bastion_sg_id]
   associate_public_ip_address = true
@@ -17,7 +17,7 @@ resource "aws_instance" "bastion" {
 resource "aws_instance" "private_host" {
   count                  = length(local.private_host_names)
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
+  instance_type          = "t2.medium"
   subnet_id              = var.private_subnet_ids[count.index]
   associate_public_ip_address = false
   vpc_security_group_ids = [var.private_sg_id]
@@ -39,7 +39,7 @@ resource "aws_volume_attachment" "ebs" {
 resource "aws_ebs_volume" "ebs" {
   count       = length(local.private_host_names)
   availability_zone = aws_instance.private_host[count.index].availability_zone
-  size              = 1
+  size              = 3
   type              = "gp2"
   tags = {
     Name = "EBSVolume"

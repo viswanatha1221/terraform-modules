@@ -26,5 +26,6 @@ module "s3" {
 }
 
 module "alb" {
-  source            = "../../tf_modules/alb"           
+  source         = "../../tf_modules/alb"
+  vpc_id         = module.vpc.vpc_id       
 }
