@@ -24,3 +24,7 @@ module "s3" {
   source      = "../../tf_modules/s3"
   bucket_name = var.bucket_name
 }
+
+module "alb" {
+  source            = "../../tf_modules/alb"           
+}
