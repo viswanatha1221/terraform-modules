@@ -4,7 +4,7 @@ locals {
 resource "aws_instance" "bastion" {
   ami                         = data.aws_ami.windows.id
   instance_type               = "t2.micro"
-  subnet_id                   = var.public_subnet_ids
+  subnet_id                   = var.public_subnet_id
   vpc_security_group_ids      = [var.bastion_sg_id]
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
