@@ -30,13 +30,14 @@ resource "aws_instance" "private_host" {
 }
 
 resource "aws_volume_attachment" "ebs" {
-  count       = length(local.private_host_names)
+  for_each          = toset(local.private_host_names)
   device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.ebs[count.index].id
-  instance_id = aws_instance.private_host[count.index].id
+  volume_id   = aws_ebs_volume.ebs[each.key].id
+  instance_id = aws_instance.private_host[each.key].id
   }
 
 resource "aws_ebs_volume" "ebs" {
+  for_each          = toset(local.private_host_names)
   availability_zone = data.aws_availability_zones.available.names[0]
   size              = 1
   type              = "gp2"
