@@ -32,8 +32,6 @@ on:
           - ERROR
 
 env:
-  AWS_ACCESS_KEY: ${{ secrets[format('AWS_ACCESS_KEY_%s', toUpper(github.event.inputs.environment))] }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_%s', toUpper(github.event.inputs.environment))] }}
   TF_LOG: ${{ github.event.inputs.tf_log_level }}
   working-directory: ./tf_modules
   
@@ -46,6 +44,19 @@ jobs:
       uses: actions/checkout@v2
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v2
+    - name: Set AWS credentials for dev
+      if: github.event.inputs.environment == 'dev'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_DEV }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+      run: echo "Using dev AWS credentials"
+
+    - name: Set AWS credentials for stage
+      if: github.event.inputs.environment == 'stage'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_STAGE }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_STAGE }}
+      run: echo "Using stage AWS credentials"
     - name: Terraform Fmt
       id: fmt
       run: terraform fmt -check
