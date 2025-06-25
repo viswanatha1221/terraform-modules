@@ -1,6 +1,5 @@
 name: Terraform CI CD Pipeline for Deploying AWS Resources
 run-name: ${{ github.actor }} has triggered the pipeline
-
 on: 
   workflow_dispatch:
     inputs:
@@ -14,13 +13,13 @@ on:
           - stage
       terraform_action:
         description: 'Terraform_Action'
-        default: ''
+        required: true
+        default: 'plan'
         type: choice
         options:
-           - ''
            - plan
            - apply        
-      TF_LOG:
+      tf_log_level:
         description: 'Terraform log level'
         required: true
         default: 'DEBUG'
@@ -37,41 +36,48 @@ env:
   AWS_ACCESS_KEY_ID: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_ACCESS_KEY_DEV || secrets.AWS_ACCESS_KEY_STAGE }}
   AWS_SECRET_ACCESS_KEY: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_SECRET_ACCESS_KEY_DEV || secrets.AWS_SECRET_ACCESS_KEY_STAGE }}
       
-  
 jobs:
   build-infra:
     name: terraform-ci-cd
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+      
     - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v2
+      uses: hashicorp/setup-terraform@v3
+      
     - name: Set AWS credentials
       env:
         AWS_ACCESS_KEY_ID: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_ACCESS_KEY_DEV || secrets.AWS_ACCESS_KEY_STAGE }}
         AWS_SECRET_ACCESS_KEY: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_SECRET_ACCESS_KEY_DEV || secrets.AWS_SECRET_ACCESS_KEY_STAGE }}
       run: |
         echo "AWS credentials set for ${{ github.event.inputs.environment }}"
+        
     - name: Terraform Fmt
       id: fmt
       run: terraform fmt -check
       continue-on-error: true
+      working-directory: ${{ env.working-directory }}
+      
     - name: Terraform Init
       id: init
       run: terraform init
       working-directory: ${{ env.working-directory }}
+      
     - name: Terraform Validate
       id: validate
       run: terraform validate
       working-directory: ${{ env.working-directory }}
+      
     - name: Terraform Plan 
       id: plan
-      run: terraform plan -out=tfplan -no-color -var-file="${{ github.event.inputs.environment }}.tfvars" $TF_LOG
+      run: terraform plan -out=tfplan -no-color -var-file="${{ github.event.inputs.environment }}.tfvars"
       working-directory: ${{ env.working-directory }}
+      
     - name: Plan output
       id: output
-      uses: actions/github-script@v3
+      uses: actions/github-script@v7
       if: github.event_name == 'pull_request'
       env:
         PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
@@ -81,7 +87,7 @@ jobs:
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             ### Workspace
  
-            \`${process.env.TF_WORKSPACE}\`
+            \`${{ github.event.inputs.environment }}\`
  
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
@@ -95,6 +101,8 @@ jobs:
  
             **Pusher**: @${{ github.actor }}
             **Action**: ${{ github.event_name }}
+            **Environment**: ${{ github.event.inputs.environment }}
+            **Terraform Action**: ${{ github.event.inputs.terraform_action }}
             `;
             github.issues.createComment({
               issue_number: context.issue.number,
@@ -102,8 +110,25 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
+            
     - name: Terraform Apply
       id: apply
-      #if: github.ref == 'refs/heads/main' && github.event.inputs.terraform_action == 'apply'
+      if: github.event.inputs.terraform_action == 'apply'
       run: terraform apply -auto-approve -input=false -no-color tfplan
       working-directory: ${{ env.working-directory }}
+      
+    - name: Display Action Summary
+      run: |
+        echo "### Terraform Pipeline Summary 📋" >> $GITHUB_STEP_SUMMARY
+        echo "- **Environment**: ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Action**: ${{ github.event.inputs.terraform_action }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Log Level**: ${{ github.event.inputs.tf_log_level }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Format Check**: ${{ steps.fmt.outcome }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Init**: ${{ steps.init.outcome }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Validate**: ${{ steps.validate.outcome }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Plan**: ${{ steps.plan.outcome }}" >> $GITHUB_STEP_SUMMARY
+        if [[ "${{ github.event.inputs.terraform_action }}" == "apply" ]]; then
+          echo "- **Apply**: ${{ steps.apply.outcome }}" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- **Apply**: Skipped (only plan was requested)" >> $GITHUB_STEP_SUMMARY
+        fi
