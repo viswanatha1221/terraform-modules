@@ -8,10 +8,10 @@ variable "public_subnet_cidr" {
 }
 
 variable "private_subnet_cidr" {
-  type = list(string)
+  type = string
 }
 
 variable "private_subnet_names" {
   type    = list(string)
   default = ["private-subnet-1", "private-subnet-2", "private-subnet-3"]
-}
+} 
