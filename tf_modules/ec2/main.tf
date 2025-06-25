@@ -30,9 +30,8 @@ resource "aws_instance" "private_host" {
 
 resource "aws_volume_attachment" "ebs" {
   device_name = "/dev/sdh"
-  depends_on  = [aws_instance.privat_host, aws_ebs_volume.ebs]
-  volume_id   = aws_ebs_volume.eds.id
-  instance_id = aws_instance.privat_host.id
+  volume_id   = aws_ebs_volume.ebs.id
+  instance_id = aws_instance.private_host.id
 }
 
 resource "aws_ebs_volume" "ebs" {
@@ -42,4 +41,50 @@ resource "aws_ebs_volume" "ebs" {
   tags = {
     Name = "EBSVolume"
   }
+}
+
+#bation role and profile
+resource "aws_iam_role" "bastion_role" {
+  name = "ec2_bastion_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_instance_profile" "bastion_profile" {
+  name = "ec2_bastion_profile"
+  role = aws_iam_role.bastion_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_bastion" {
+  role       = aws_iam_role.bastion_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+#db role and profile
+resource "aws_iam_role" "db_role" {
+  name = "ec2_db_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_instance_profile" "db_profile" {
+  name = "ec2_db_profile"
+  role = aws_iam_role.db_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_db" {
+  role       = aws_iam_role.db_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }

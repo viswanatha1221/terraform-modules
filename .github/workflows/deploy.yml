@@ -34,6 +34,9 @@ on:
 env:
   TF_LOG: ${{ github.event.inputs.tf_log_level }}
   working-directory: "env/${{ github.event.inputs.environment }}"
+  AWS_ACCESS_KEY_ID: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_ACCESS_KEY_DEV || secrets.AWS_ACCESS_KEY_STAGE }}
+  AWS_SECRET_ACCESS_KEY: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_SECRET_ACCESS_KEY_DEV || secrets.AWS_SECRET_ACCESS_KEY_STAGE }}
+      
   
 jobs:
   build-infra:
@@ -56,9 +59,6 @@ jobs:
       continue-on-error: true
     - name: Terraform Init
       id: init
-      env:
-        AWS_ACCESS_KEY_ID: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_ACCESS_KEY_DEV || secrets.AWS_ACCESS_KEY_STAGE }}
-        AWS_SECRET_ACCESS_KEY: ${{ github.event.inputs.environment == 'dev' && secrets.AWS_SECRET_ACCESS_KEY_DEV || secrets.AWS_SECRET_ACCESS_KEY_STAGE }}
       run: terraform init
       working-directory: ${{ env.working-directory }}
     - name: List files
