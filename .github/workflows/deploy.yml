@@ -33,7 +33,7 @@ on:
 
 env:
   TF_LOG: ${{ github.event.inputs.tf_log_level }}
-  working-directory: ./tf_modules
+  working-directory: "../envs/${{ github.event.inputs.environment }}"
   
 jobs:
   build-infra:
