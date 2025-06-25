@@ -7,7 +7,7 @@ variable "private_sg_id" {
 }
 
 variable "public_subnet_ids" {
-  type = list(string)
+  type = string
 }
 
 variable "private_subnet_ids" {
